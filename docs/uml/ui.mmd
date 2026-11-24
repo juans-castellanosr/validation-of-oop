@@ -1,0 +1,690 @@
+---
+config:
+  handDrawnSeed: 1
+  htmlLabels: false
+  class:
+    htmlLabels: false
+---
+classDiagram
+  class BodyKit {
+    -HURT : Color$
+    -BodyKit()
+    ~blend(a : Color, b : Color, k : double)$ Color
+    ~eye(g : Graphics2D, x : double, y : double, size : double)$ void
+    ~fin(g : Graphics2D, fin : Shape, color : Color, line : Color, radius : double)$ void
+    ~outline(g : Graphics2D, shape : Shape, color : Color, radius : double)$ void
+    ~profile(max : double, peak : double, snout : double)$ DoubleUnaryOperator
+    ~shade(g : Graphics2D, body : Shape, palette : BodyKit.Palette, radius : double)$ void
+    ~spine(t : double, amplitude : double, phase : double, wavelength : double)$ double
+    ~spineBody(tailX : double, headX : double, thickness : DoubleUnaryOperator, amplitude : double, phase : double, wavelength : double)$ Path2D
+  }
+  class BodyKit_Palette["BodyKit.Palette"] {
+    <<record>>
+    -back : Color
+    -side : Color
+    -belly : Color
+    ~hurt(amount : double) BodyKit.Palette
+    ~line() Color
+  }
+  class CatalogAdminActions {
+    <<interface>>
+    +changePin(newPin : char[])* void «abstract»
+    +recordChange(description : String)* void «abstract»
+    +recordError(message : String, error : Throwable)* void «abstract»
+    +saveCatalog(catalog : SpeciesCatalog)* void «abstract»
+  }
+  class CatalogAdminDialog {
+    -ALL : String$
+    -catalog : SpeciesCatalog
+    -pendingChanges : List~String~
+    -actions : CatalogAdminActions
+    -model : CatalogAdminDialog.SpeciesTableModel
+    -table : JTable
+    -sorter : TableRowSorter~CatalogAdminDialog.SpeciesTableModel~
+    -search : JTextField
+    -zoneFilter : JComboBox~Object~
+    -dietFilter : JComboBox~Object~
+    -unsaved : boolean
+    ~CatalogAdminDialog(owner : Window, catalog : SpeciesCatalog, loadProblems : List~String~, actions : CatalogAdminActions)
+    -addSpecies() void
+    -applyFilters() void
+    -buttons() JPanel
+    -changePin() void
+    -changed(description : String) void
+    -close() void
+    -editSpecies(original : Species) void
+    -removeSpecies(species : Species) void
+    -save() boolean
+    -selected() Optional~Species~
+    -warnIfFromAnotherTime(species : Species) void
+    -withAll(values : Object[])$ Object[]
+  }
+  class CatalogAdminDialog_SpeciesTableModel["CatalogAdminDialog.SpeciesTableModel"] {
+    -COLUMNS : String[]$
+    -catalog : SpeciesCatalog
+    -rows : List~Species~
+    ~SpeciesTableModel(catalog : SpeciesCatalog)
+    +getColumnClass(column : int) Class~?~
+    +getColumnCount() int
+    +getColumnName(column : int) String
+    +getRowCount() int
+    +getValueAt(row : int, column : int) Object
+    ~reload() void
+    ~speciesAt(row : int) Species
+  }
+  class CoexistenceNote {
+    -CoexistenceNote()
+    ~text(catalog : SpeciesCatalog)$ String
+    ~warningFor(catalog : SpeciesCatalog, species : Species)$ String
+    -when(ageMa : Range~Double~)$ String
+  }
+  class CreatureArt {
+    -PAINTERS : Map~BodyShape,CreaturePainter~$
+    -SHELL : BodyKit.Palette$
+    -TURTLE_SKIN : BodyKit.Palette$
+    -MOSASAUR : BodyKit.Palette$
+    -SHARK : BodyKit.Palette$
+    -PLESIO : BodyKit.Palette$
+    -SILVER : BodyKit.Palette$
+    -DEEP_BLUE : BodyKit.Palette$
+    -AMMONITE : BodyKit.Palette$
+    -CLAM : BodyKit.Palette$
+    -CreatureArt()
+    -clam(g : Graphics2D, p : CreaturePose)$ void
+    -coiledAmmonite(g : Graphics2D, p : CreaturePose)$ void
+    -flipper(g : Graphics2D, x : double, y : double, length : double, width : double, angle : double, color : Color, line : Color, r : double)$ void
+    -forkedTail(g : Graphics2D, x : double, y : double, size : double, color : Color, line : Color, r : double)$ void
+    -mosasaur(g : Graphics2D, p : CreaturePose)$ void
+    ~painterFor(shape : BodyShape)$ CreaturePainter
+    -plesiosaur(g : Graphics2D, p : CreaturePose)$ void
+    -predatoryFish(g : Graphics2D, p : CreaturePose)$ void
+    -shark(g : Graphics2D, p : CreaturePose)$ void
+    -slenderFish(g : Graphics2D, p : CreaturePose)$ void
+    -straightAmmonite(g : Graphics2D, p : CreaturePose)$ void
+    -tentacles(g : Graphics2D, r : double, time : double, from : double, c : BodyKit.Palette)$ void
+    -turtle(g : Graphics2D, p : CreaturePose)$ void
+  }
+  class CreaturePainter {
+    <<interface>>
+    +paint(g : Graphics2D, pose : CreaturePose)* void «abstract»
+  }
+  class CreaturePose {
+    <<record>>
+    -radius : double
+    -phase : double
+    -time : double
+    -hurt : double
+    ~still(radius : double)$ CreaturePose
+  }
+  class FeedbackEffects {
+    -TEXT_SECONDS : double$
+    -RING_SECONDS : double$
+    -BUBBLE_SECONDS : double$
+    -BITE_SECONDS : double$
+    -BREATH_INTERVAL : double$
+    -MAX_EFFECTS : int$
+    -effects : List~FeedbackEffects.Effect~
+    -previous : GameSnapshot
+    -biteSecondsLeft : double
+    -breathTimer : double
+    -reducedMotion : boolean
+    -add(effect : FeedbackEffects.Effect) void
+    ~paintInOcean(g : Graphics2D) void
+    ~paintOnScreen(g : Graphics2D, width : int, height : int) void
+    -player(snapshot : GameSnapshot)$ EntityView
+    ~playerHurt() double
+    ~reset() void
+    ~setReducedMotion(reduced : boolean) void
+    ~update(current : GameSnapshot, dt : double) void
+  }
+  class FeedbackEffects_Effect["FeedbackEffects.Effect"] {
+    -kind : FeedbackEffects.Kind
+    -x : double
+    -y : double
+    -duration : double
+    -text : String
+    -dx : double
+    -dy : double
+    -age : double
+    ~Effect(kind : FeedbackEffects.Kind, x : double, y : double, duration : double, text : String)
+    ~Effect(kind : FeedbackEffects.Kind, x : double, y : double, duration : double, text : String, dx : double, dy : double)
+    ~progress() double
+  }
+  class FeedbackEffects_Kind["FeedbackEffects.Kind"] {
+    <<enumeration>>
+    GAIN_TEXT
+    GROWTH_RING
+    BREATH_BUBBLE
+    CRUMB
+    SPARKLE
+  }
+  class GameScreen {
+    -FRAME_MILLIS : int$
+    -MESSAGE_SECONDS : double$
+    -FADE_SECONDS : double$
+    -MAX_QUEUED_MESSAGES : int$
+    -actions : GameScreenActions
+    -renderer : OceanRenderer
+    -held : Map~Integer,GameScreen.Direction~
+    -pauseButton : JButton
+    -effects : FeedbackEffects
+    -messages : Deque~String~
+    -hud : HudBar
+    -ocean : GameScreen.OceanView
+    -frameTimer : Timer
+    -engine : GameEngine
+    -generation : int
+    -message : String
+    -messageAge : double
+    -lastFrameNanos : long
+    -animationTime : double
+    ~GameScreen(actions : GameScreenActions)
+    -advanceMessages(dt : double) void
+    ~attach(newEngine : GameEngine) void
+    -bind(keys : InputMap, stroke : KeyStroke, name : String, action : Runnable) void
+    -bindDirection(keys : InputMap, keyCode : int, direction : GameScreen.Direction) void
+    -creatureAt(point : Vector2) Optional~EntityView~
+    ~detach() void
+    -installFocusLoss() void
+    -installKeys() void
+    -installMouse() void
+    ~listener() GameListener
+    -refresh() void
+    -sendSteering() void
+    ~setReducedMotion(reduced : boolean) void
+    ~showMessage(text : String) void
+    -submit(command : Consumer~GameSession~) void
+    -toOcean(x : int, y : int) Vector2
+    ~togglePause() void
+  }
+  class GameScreenActions {
+    <<interface>>
+    +endRequested()* void «abstract»
+    +gameFailed(error : Throwable)* void «abstract»
+    +gameFinished(finalSnapshot : GameSnapshot)* void «abstract»
+    +saveRequested()* void «abstract»
+    +speciesInfoRequested(speciesId : String)* void «abstract»
+  }
+  class GameScreen_Direction["GameScreen.Direction"] {
+    <<enumeration>>
+    UP
+    DOWN
+    LEFT
+    RIGHT
+    -vector : Vector2
+    -Direction(x : double, y : double)
+  }
+  class GameScreen_OceanView["GameScreen.OceanView"] {
+    -frameDt : double
+    ~OceanView()
+    #paintComponent(graphics : Graphics) void
+    -paintKeyHints(g : Graphics2D) void
+    -paintOverlayTexts(g : Graphics2D) void
+  }
+  class HudBar {
+    -METER_WIDTH : int$
+    -METER_GAP : int$
+    -LOW : double$
+    -CONTENT_WIDTH : int$
+    -LABEL : Font$
+    -SCORE : Font$
+    -TIME : Font$
+    -CAPTION : Font$
+    -snapshot : GameSnapshot
+    ~HudBar(pause : JButton, save : JButton, end : JButton)
+    -buttonsWidth() int
+    +doLayout() void
+    -drawIcon(g : Graphics2D, icon : HudBar.Icon, cx : double, cy : double, color : Color)$ void
+    -drawWarningShape(g : Graphics2D, cx : double, cy : double)$ void
+    -fitted(text : String, fm : FontMetrics, width : int)$ String
+    +getPreferredSize() Dimension
+    -meter(g : Graphics2D, x : int, icon : HudBar.Icon, label : String, level : double, color : Color, caption : HudBar.Caption)$ void
+    -nextStage(stage : GrowthStage)$ HudBar.Caption
+    #paintComponent(graphics : Graphics) void
+    -rowHeight()$ int
+    ~show(latest : GameSnapshot) void
+    -singleRow(width : int) boolean
+  }
+  class HudBar_Caption["HudBar.Caption"] {
+    <<record>>
+    -text : String
+    -warning : boolean
+  }
+  class HudBar_Icon["HudBar.Icon"] {
+    <<enumeration>>
+    HEART
+    BUBBLE
+    SPROUT
+  }
+  class LeaderboardTable {
+    -DATE : DateTimeFormatter$
+    -LeaderboardTable()
+    ~of(entries : Collection~ScoreEntry~)$ JScrollPane
+    ~outcome(outcome : GameStatus)$ String
+  }
+  class MainWindow {
+    -MENU : String$
+    -GAME : String$
+    -services : MuseumServices
+    -cards : CardLayout
+    -screens : JPanel
+    -menu : MenuScreen
+    -game : GameScreen
+    -engine : GameEngine
+    -saving : SwingWorker&lt;Optional&lt;Path&gt;, Void&gt;
+    -gameRequests : int
+    +MainWindow(services : MuseumServices)
+    -applyReducedMotion(reduced : boolean) void
+    -continueSavedGame() void
+    -export(what : String, export : MainWindow.Export) void
+    -finishPendingSave() void
+    -fitToScreen() void
+    -menuButton(text : String, color : Color, action : Runnable) JButton
+    +open() void
+    -openAdministration() void
+    -openSettings() void
+    -pauseForDialog() MainWindow.DialogPause
+    -play() void
+    -quit() void
+    -resumeAfterDialog(pause : MainWindow.DialogPause) void
+    -showMenu() void
+    -showResumed(attempt : ResumeAttempt) void
+    -showScores() void
+    -startEngine(session : GameSession) void
+    -stopEngine() void
+  }
+  class MainWindow_AdminActions["MainWindow.AdminActions"] {
+    +changePin(newPin : char[]) void
+    +recordChange(description : String) void
+    +recordError(message : String, error : Throwable) void
+    +saveCatalog(catalog : SpeciesCatalog) void
+  }
+  class MainWindow_DialogPause["MainWindow.DialogPause"] {
+    <<record>>
+    -engine : GameEngine
+    -pausedByUs : CompletableFuture~Boolean~
+  }
+  class MainWindow_Export["MainWindow.Export"] {
+    <<interface>>
+    +run()* Path «abstract»
+  }
+  class MainWindow_GameActions["MainWindow.GameActions"] {
+    +endRequested() void
+    +gameFailed(error : Throwable) void
+    +gameFinished(finalSnapshot : GameSnapshot) void
+    +saveRequested() void
+    -showResults(result : ScoreEntry, finalSnapshot : GameSnapshot) void
+    +speciesInfoRequested(speciesId : String) void
+  }
+  class MenuScreen {
+    -renderer : OceanRenderer
+    -animation : Timer
+    -first : JButton
+    -card : JPanel
+    -intro : JPanel
+    -actions : JPanel
+    -time : double
+    ~MenuScreen(buttons : JButton[])
+    -arrange(panel : JPanel, intro : JPanel, actions : JPanel, stacked : boolean)$ void
+    -centered(c : JComponent)$ JComponent
+    -column()$ JPanel
+    +doLayout() void
+    -moveFocusWith(from : JButton, key : int, to : JButton)$ void
+    #paintComponent(g : Graphics) void
+    ~setReducedMotion(reduced : boolean) void
+    ~startAnimation() void
+    ~stopAnimation() void
+  }
+  class MenuScreen_Emblem["MenuScreen.Emblem"] {
+    ~Emblem()
+    #paintComponent(graphics : Graphics) void
+  }
+  class MenuScreen_HowToPlay["MenuScreen.HowToPlay"] {
+    -STEPS : String[]$
+    ~HowToPlay()
+    -drawSymbol(g : Graphics2D, step : int, cx : double, cy : double)$ void
+    #paintComponent(graphics : Graphics) void
+    -wrap(text : String)$ String[]
+  }
+  class MenuScreen_Title["MenuScreen.Title"] {
+    -TEXT : String$
+    ~Title()
+    #paintComponent(graphics : Graphics) void
+  }
+  class MuseumServices {
+    <<interface>>
+    +catalog()* SpeciesCatalog «abstract»
+    +catalogProblems()* List~String~ «abstract»
+    +changeAdminPin(pin : char[])* void «abstract»
+    +exportReport(result : ScoreEntry, census : Map~String,Integer~)* Path «abstract»
+    +exportScores()* Path «abstract»
+    +leaderboard()* Leaderboard «abstract»
+    +recordError(message : String, error : Throwable)* void «abstract»
+    +recordEvent(message : String)* void «abstract»
+    +recordScore(entry : ScoreEntry)* void «abstract»
+    +resumeLatestGame()* ResumeAttempt «abstract»
+    +saveCatalog(catalog : SpeciesCatalog)* void «abstract»
+    +saveGame(memento : GameMemento)* Path «abstract»
+    +saveSettings(settings : GameSettings)* void «abstract»
+    +settings()* GameSettings «abstract»
+    +startupProblems()* List~String~ «abstract»
+    +verifyAdminPin(pin : char[])* boolean «abstract»
+  }
+  class OceanButton {
+    -MIN_HEIGHT : int$
+    -ARC : int$
+    -base : Color
+    ~OceanButton(text : String, color : Color)
+    +getPreferredSize() Dimension
+    #paintComponent(graphics : Graphics) void
+  }
+  class OceanRenderer {
+    -MAX_TILT : double$
+    -TURN_RATE : double$
+    -TILT_RATE : double$
+    -FOOD_GLOW_OUTER : Color$
+    -FOOD_GLOW_INNER : Color$
+    -FOOD_CORE : Color$
+    -scenery : OceanScenery
+    -looks : Map~Long,OceanRenderer.Look~
+    -reducedMotion : boolean
+    -frame : long
+    -forgetUnseen() void
+    -look(view : EntityView, dt : double) OceanRenderer.Look
+    ~paint(g : Graphics2D, width : int, height : int, snapshot : GameSnapshot, time : double, dt : double, effects : FeedbackEffects) void
+    -paintCreature(g : Graphics2D, view : EntityView, look : OceanRenderer.Look, time : double, hurt : double)$ void
+    -paintFood(g : Graphics2D, food : List~Vector2~, time : double)$ void
+    -paintPassingAnimals(g : Graphics2D, time : double)$ void
+    -paintPauseVeil(g : Graphics2D, width : int, height : int)$ void
+    -paintPlayerRing(g : Graphics2D, r : double, shielded : boolean)$ void
+    -passing(g : Graphics2D, shape : BodyShape, radius : double, y : double, speed : double, time : double, offset : double, swim : double)$ void
+    ~setReducedMotion(reduced : boolean) void
+  }
+  class OceanRenderer_Look["OceanRenderer.Look"] {
+    -facing : double
+    -tilt : double
+    -phase : double
+    -seenFrame : long
+  }
+  class OceanScenery {
+    ~W : double$
+    ~H : double$
+    -FLOOR : double$
+    -SURFACE : double$
+    -SNOW : int$
+    -BUBBLES : int$
+    -KELP : int$
+    -random : Random
+    -snow : double[][]
+    -bubbles : double[][]
+    -cached : BufferedImage
+    -raySprite : BufferedImage
+    -raySpriteScaleX : double
+    -raySpriteScaleY : double
+    ~OceanScenery()
+    -createRaySprite(target : Graphics2D, sx : double, sy : double)$ BufferedImage
+    ~paintBackground(g : Graphics2D, width : int, height : int) void
+    ~paintBehind(g : Graphics2D, time : double) void
+    -paintCaustics(g : Graphics2D, time : double)$ void
+    ~paintCold(g : Graphics2D) void
+    -paintCrinoid(g : Graphics2D, x : double, y : double, height : double)$ void
+    ~paintCurrent(g : Graphics2D, current : Vector2, time : double) void
+    -paintFarSilhouettes(g : Graphics2D)$ void
+    ~paintFront(g : Graphics2D, dt : double, drift : Vector2) void
+    -paintKelp(g : Graphics2D, x : double, base : double, height : double, time : double, seed : int)$ void
+    -paintRays(g : Graphics2D, time : double) void
+    -paintRock(g : Graphics2D, x : double, y : double, w : double, h : double)$ void
+    -paintSeabed(g : Graphics2D)$ void
+    -paintSponge(g : Graphics2D, x : double, y : double, size : double)$ void
+    -paintStill(g : Graphics2D)$ void
+    -paintSurface(g : Graphics2D, time : double)$ void
+    -wrap(value : double, size : double)$ double
+  }
+  class ResultsDialog {
+    -choice : ResultsDialog.Choice
+    ~ResultsDialog(owner : Window, result : ScoreEntry, best : Collection~ScoreEntry~, onExport : Runnable, reducedMotion : boolean)
+    ~ask() ResultsDialog.Choice
+    -left(c : JComponent)$ JComponent
+    -subtitle(outcome : GameStatus)$ String
+    -title(outcome : GameStatus)$ String
+  }
+  class ResultsDialog_Banner["ResultsDialog.Banner"] {
+    -CELEBRATION_SECONDS : double$
+    -outcome : GameStatus
+    -stage : GrowthStage
+    -timer : Timer
+    -time : double
+    ~Banner(outcome : GameStatus, stage : GrowthStage, reducedMotion : boolean)
+    #paintComponent(graphics : Graphics) void
+    +removeNotify() void
+  }
+  class ResultsDialog_Choice["ResultsDialog.Choice"] {
+    <<enumeration>>
+    MENU
+    PLAY_AGAIN
+  }
+  class ResumeAttempt {
+    <<record>>
+    -session : Optional~GameSession~
+    -skippedSaves : List~String~
+    -anySaveFound : boolean
+    +ResumeAttempt(session : Optional~GameSession~, skippedSaves : List~String~, anySaveFound : boolean)
+  }
+  class ScoresDialog {
+    ~ScoresDialog(owner : Window, best : Collection~ScoreEntry~, onExport : Runnable)
+  }
+  class SettingsDialog {
+    -name : JTextField
+    -difficulty : JComboBox~Difficulty~
+    -events : JComboBox~EventFrequency~
+    -size : JComboBox~InterfaceSize~
+    -reducedMotion : JCheckBox
+    -creatures : JSlider
+    -difficultyHelp : JLabel
+    -error : JLabel
+    -result : GameSettings
+    ~SettingsDialog(owner : Window, current : GameSettings)
+    -add(content : JPanel, c : Component)$ void
+    ~ask() Optional~GameSettings~
+    -explainDifficulty() void
+    -labelFor(text : String, target : JComponent)$ JLabel
+    -section(content : JPanel, title : String)$ void
+    -trySave() void
+  }
+  class SpeciesBrowserDialog {
+    ~SpeciesBrowserDialog(owner : Window, catalog : SpeciesCatalog)
+  }
+  class SpeciesFormDialog {
+    -id : JTextField
+    -scientificName : JTextField
+    -commonName : JTextField
+    -period : JTextField
+    -youngestMa : JTextField
+    -oldestMa : JTextField
+    -length : JTextField
+    -diet : JComboBox~Diet~
+    -zone : JComboBox~Zone~
+    -behavior : JComboBox~Behavior~
+    -shape : JComboBox~BodyShape~
+    -airBreather : JCheckBox
+    -funFact : JTextArea
+    -source : JTextField
+    -error : JLabel
+    -result : Species
+    ~SpeciesFormDialog(owner : Window, existing : Optional~Species~)
+    ~ask() Optional~Species~
+    -combo(values : E[])$ JComboBox~E~
+    -field(grid : JPanel, label : String, input : Component)$ void
+    -fill(s : Species) void
+    -left(c : JComponent)$ JComponent
+    -number(field : JTextField, name : String)$ double
+    -trySave() void
+  }
+  class SpeciesInfoDialog {
+    -TEXT_WIDTH : int$
+    ~SpeciesInfoDialog(owner : Window, species : Species, coexistenceNote : String)
+    -addRow(grid : JPanel, label : String, value : String)$ void
+    -left(c : JComponent)$ JComponent
+    -section(title : String)$ JComponent
+    -wrapped(text : String, font : Font, background : Color, padding : int)$ JTextArea
+  }
+  class SpeciesInfoDialog_Portrait["SpeciesInfoDialog.Portrait"] {
+    -species : Species
+    ~Portrait(species : Species)
+    #paintComponent(graphics : Graphics) void
+  }
+  class TableStyle {
+    -STRIPE : Color$
+    -TableStyle()
+    ~apply(table : JTable, rightAlignedColumns : Integer[])$ void
+    ~fitColumnsToContent(table : JTable)$ int
+  }
+  class TableStyle_Stripes["TableStyle.Stripes"] {
+    -rightAligned : Set~Integer~
+    ~Stripes(rightAligned : Set~Integer~)
+    +getTableCellRendererComponent(table : JTable, value : Object, selected : boolean, focused : boolean, row : int, column : int) Component
+  }
+  class Theme {
+    ~MIN_TEXT_CONTRAST : double$
+    ~NAVY : Color$
+    ~SEA : Color$
+    ~SKY : Color$
+    ~SAND : Color$
+    ~CORAL : Color$
+    ~GREEN : Color$
+    ~GREY : Color$
+    ~PALE : Color$
+    ~INK : Color$
+    ~WHITE : Color$
+    ~FOCUS : Color$
+    ~DISABLED_FILL : Color$
+    ~DISABLED_TEXT : Color$
+    ~MENU_PANEL_ALPHA : int$
+    ~WATER_TOP : Color$
+    ~WATER_BOTTOM : Color$
+    ~LIFE : Color$
+    ~AIR : Color$
+    ~GROWTH : Color$
+    ~SCALE : double$
+    ~TITLE : Font$
+    ~HEADING : Font$
+    ~SECTION : Font$
+    ~BODY : Font$
+    ~BODY_BOLD : Font$
+    ~SMALL : Font$
+    ~TEXT_PAIRS : Color[][]$
+    ~TRANSLUCENT_TEXT_PAIRS : Color[][]$
+    -Theme()
+    -channel(value : int)$ double
+    ~composite(top : Color, bottom : Color)$ Color
+    ~contrast(a : Color, b : Color)$ double
+    ~darker(color : Color)$ Color
+    ~font(style : int, points : float)$ Font
+    -luminance(c : Color)$ double
+    ~px(pixels : int)$ int
+    ~size(points : float)$ float
+  }
+  class UiFactory {
+    -UiFactory()
+    ~button(text : String, background : Color)$ JButton
+    ~closeOnEscape(dialog : JDialog)$ void
+    ~confirm(parent : Component, title : String, message : String, doIt : String, keep : String)$ boolean
+    ~focusWhenShown(field : T)$ T
+    ~label(text : String, font : Font, color : Color)$ JLabel
+    ~packWithinScreen(dialog : JDialog, actions : JComponent)$ void
+  }
+  class UiScale {
+    -factor : double$
+    -UiScale()
+    +apply(newFactor : double)$ void
+    ~factor()$ double
+  }
+  CatalogAdminActions ..> SpeciesCatalog
+  CatalogAdminDialog --> SpeciesCatalog : catalog
+  CatalogAdminDialog --> CatalogAdminActions : actions
+  CatalogAdminDialog --> CatalogAdminDialog_SpeciesTableModel : model
+  CatalogAdminDialog --> CatalogAdminDialog_SpeciesTableModel : sorter
+  CatalogAdminDialog_SpeciesTableModel --> SpeciesCatalog : catalog
+  CatalogAdminDialog_SpeciesTableModel --> "*" Species : rows
+  CoexistenceNote ..> SpeciesCatalog
+  CoexistenceNote ..> Species
+  CreatureArt ..> CreaturePainter
+  FeedbackEffects --> "*" FeedbackEffects_Effect : effects
+  FeedbackEffects --> GameSnapshot : previous
+  FeedbackEffects_Effect --> FeedbackEffects_Kind : kind
+  GameScreen --> GameScreenActions : actions
+  GameScreen --> OceanRenderer : renderer
+  GameScreen --> "*" GameScreen_Direction : held
+  GameScreen --> FeedbackEffects : effects
+  GameScreen --> HudBar : hud
+  GameScreen --> GameScreen_OceanView : ocean
+  GameScreen --> GameEngine : engine
+  GameScreen ..> GameListener
+  GameScreen_Direction --> Vector2 : vector
+  GameScreen_OceanView ..> GameScreen
+  HudBar --> GameSnapshot : snapshot
+  MainWindow --> MuseumServices : services
+  MainWindow --> MenuScreen : menu
+  MainWindow --> GameScreen : game
+  MainWindow --> GameEngine : engine
+  CatalogAdminActions <|.. MainWindow_AdminActions
+  MainWindow_DialogPause --> GameEngine : engine
+  GameScreenActions <|.. MainWindow_GameActions
+  MenuScreen --> OceanRenderer : renderer
+  MuseumServices ..> SpeciesCatalog
+  MuseumServices ..> Leaderboard
+  OceanRenderer --> OceanScenery : scenery
+  OceanRenderer --> "*" OceanRenderer_Look : looks
+  OceanRenderer ..> FeedbackEffects
+  ResultsDialog --> ResultsDialog_Choice : choice
+  ResultsDialog_Banner --> GameStatus : outcome
+  ResultsDialog_Banner --> GrowthStage : stage
+  ResumeAttempt --> "0..1" GameSession : session
+  SettingsDialog --> Difficulty : difficulty
+  SettingsDialog --> EventFrequency : events
+  SettingsDialog --> InterfaceSize : size
+  SettingsDialog --> GameSettings : result
+  SpeciesBrowserDialog ..> SpeciesCatalog
+  SpeciesFormDialog --> Diet : diet
+  SpeciesFormDialog --> Zone : zone
+  SpeciesFormDialog --> Behavior : behavior
+  SpeciesFormDialog --> BodyShape : shape
+  SpeciesFormDialog --> Species : result
+  SpeciesInfoDialog ..> Species
+  SpeciesInfoDialog_Portrait --> Species : species
+  class SpeciesCatalog["SpeciesCatalog<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click SpeciesCatalog href "catalog.svg" "Ver SpeciesCatalog en catalog.svg"
+  class Species["Species<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click Species href "catalog.svg" "Ver Species en catalog.svg"
+  class GameSnapshot["GameSnapshot<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click GameSnapshot href "game.svg" "Ver GameSnapshot en game.svg"
+  class GameEngine["GameEngine<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click GameEngine href "game.svg" "Ver GameEngine en game.svg"
+  class GameListener["GameListener<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click GameListener href "game.svg" "Ver GameListener en game.svg"
+  class Vector2["Vector2<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click Vector2 href "model.svg" "Ver Vector2 en model.svg"
+  class Leaderboard["Leaderboard<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click Leaderboard href "game.svg" "Ver Leaderboard en game.svg"
+  class GameStatus["GameStatus<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click GameStatus href "game.svg" "Ver GameStatus en game.svg"
+  class GrowthStage["GrowthStage<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click GrowthStage href "model.svg" "Ver GrowthStage en model.svg"
+  class GameSession["GameSession<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click GameSession href "game.svg" "Ver GameSession en game.svg"
+  class Difficulty["Difficulty<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click Difficulty href "game.svg" "Ver Difficulty en game.svg"
+  class EventFrequency["EventFrequency<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click EventFrequency href "game.svg" "Ver EventFrequency en game.svg"
+  class InterfaceSize["InterfaceSize<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click InterfaceSize href "game.svg" "Ver InterfaceSize en game.svg"
+  class GameSettings["GameSettings<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click GameSettings href "game.svg" "Ver GameSettings en game.svg"
+  class Diet["Diet<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click Diet href "catalog.svg" "Ver Diet en catalog.svg"
+  class Zone["Zone<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click Zone href "catalog.svg" "Ver Zone en catalog.svg"
+  class Behavior["Behavior<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click Behavior href "catalog.svg" "Ver Behavior en catalog.svg"
+  class BodyShape["BodyShape<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click BodyShape href "catalog.svg" "Ver BodyShape en catalog.svg"

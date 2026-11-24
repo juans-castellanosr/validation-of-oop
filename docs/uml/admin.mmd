@@ -1,0 +1,31 @@
+---
+config:
+  handDrawnSeed: 1
+  htmlLabels: false
+  class:
+    htmlLabels: false
+---
+classDiagram
+  class AdminAccess {
+    +DEFAULT_PIN : String$
+    +MIN_DIGITS : int$
+    +MAX_DIGITS : int$
+    -SCHEME : String$
+    -ALGORITHM : String$
+    -ITERATIONS : int$
+    -MAX_ITERATIONS : int$
+    -SALT_BYTES : int$
+    -HASH_BYTES : int$
+    -RANDOM : SecureRandom$
+    -iterations : int
+    -salt : byte[]
+    -hash : byte[]
+    -AdminAccess(iterations : int, salt : byte[], hash : byte[])
+    -derive(pin : char[], salt : byte[], iterations : int)$ byte[]
+    +encode() String
+    +fromPin(pin : char[])$ AdminAccess
+    -isWellFormed(pin : char[])$ boolean
+    +parse(encoded : String)$ AdminAccess
+    +verify(pin : char[]) boolean
+    +withDefaultPin()$ AdminAccess
+  }

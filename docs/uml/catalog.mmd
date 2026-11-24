@@ -1,0 +1,216 @@
+---
+config:
+  handDrawnSeed: 1
+  htmlLabels: false
+  class:
+    htmlLabels: false
+---
+classDiagram
+  class Behavior {
+    <<enumeration>>
+    HUNTER
+    SCHOOLING
+    DRIFTER
+    SESSILE
+    -displayName : String
+    -Behavior(displayName : String)
+    +displayName() String
+  }
+  class BodyShape {
+    <<enumeration>>
+    TURTLE
+    MOSASAUR
+    SHARK
+    PLESIOSAUR
+    BONY_FISH
+    PREDATORY_FISH
+    AMMONITE
+    STRAIGHT_AMMONITE
+    CLAM
+    -displayName : String
+    -preyKind : PreyKind
+    -BodyShape(displayName : String, preyKind : PreyKind)
+    +displayName() String
+    +preyKind() PreyKind
+  }
+  class Coexistence {
+    -sharedPeriod : Range~Double~
+    -together : List~Species~
+    -apart : List~Species~
+    -Coexistence(sharedPeriod : Range~Double~, together : List~Species~, apart : List~Species~)
+    +apart() List~Species~
+    +fits(candidate : Species) boolean
+    +of(species : Collection~Species~)$ Coexistence
+    +sharedPeriod() Optional~Range~Double~~
+    +together() List~Species~
+  }
+  class Diet {
+    <<enumeration>>
+    CARNIVORE
+    PISCIVORE
+    OMNIVORE
+    PLANKTIVORE
+    FILTER_FEEDER
+    DETRITIVORE
+    -displayName : String
+    -accepted : Set~PreyKind~
+    -Diet(displayName : String, accepted : EnumSet~PreyKind~)
+    +accepts(kind : PreyKind) boolean
+    +displayName() String
+  }
+  class DisplayNamed {
+    <<interface>>
+    +displayName()* String «abstract»
+  }
+  class PreyKind {
+    <<enumeration>>
+    SMALL_PREY
+    FISH
+    CEPHALOPOD
+    SHELLFISH
+    REPTILE
+  }
+  class Range~T~ {
+    -min : T
+    -max : T
+    -Range(min : T, max : T)
+    +clamp(value : T) T
+    +contains(value : T) boolean
+    +equals(o : Object) boolean
+    +hashCode() int
+    +max() T
+    +min() T
+    +of(min : T, max : T)$ Range~T~
+    +overlaps(other : Range~T~) boolean
+    +toString() String
+  }
+  class Species {
+    +OLDEST_AGE_MA : double$
+    +MAX_LENGTH_METERS : double$
+    -ID_PATTERN : Pattern$
+    -id : String
+    -scientificName : String
+    -commonName : String
+    -period : String
+    -ageMa : Range~Double~
+    -lengthMeters : double
+    -diet : Diet
+    -zone : Zone
+    -airBreather : boolean
+    -behavior : Behavior
+    -shape : BodyShape
+    -funFact : String
+    -source : String
+    -Species(b : Species.Builder)
+    +ageMa() Range~Double~
+    +airBreather() boolean
+    +behavior() Behavior
+    +builder()$ Species.Builder
+    +commonName() String
+    +diet() Diet
+    +equals(o : Object) boolean
+    +funFact() String
+    +gameDefinition() String
+    +hashCode() int
+    +id() String
+    +lengthMeters() double
+    +livedAt(millionYearsAgo : double) boolean
+    +livedAt(period : Range~Double~) boolean
+    +period() String
+    +scientificName() String
+    +shape() BodyShape
+    +source() String
+    +toBuilder() Species.Builder
+    +toString() String
+    +zone() Zone
+  }
+  class SpeciesCatalog {
+    -byId : Map~String,Species~
+    +SpeciesCatalog()
+    +SpeciesCatalog(original : SpeciesCatalog)
+    +add(species : Species) void
+    +all() List~Species~
+    +filter(condition : Predicate~? super Species~) List~Species~
+    +find(id : String) Optional~Species~
+    +remove(id : String) boolean
+    +replace(originalId : String, edited : Species) void
+    +size() int
+    +sorted(order : Comparator~? super Species~) List~Species~
+  }
+  class Species_Builder["Species.Builder"] {
+    -id : String
+    -scientificName : String
+    -commonName : String
+    -period : String
+    -minMa : double
+    -maxMa : double
+    -lengthMeters : double
+    -diet : Diet
+    -zone : Zone
+    -airBreather : boolean
+    -behavior : Behavior
+    -shape : BodyShape
+    -funFact : String
+    -source : String
+    -Builder()
+    +ageMa(youngestMa : double, oldestMa : double) Species.Builder
+    +airBreather(value : boolean) Species.Builder
+    +behavior(value : Behavior) Species.Builder
+    +build() Species
+    +commonName(value : String) Species.Builder
+    +diet(value : Diet) Species.Builder
+    +funFact(value : String) Species.Builder
+    +id(value : String) Species.Builder
+    +lengthMeters(value : double) Species.Builder
+    +period(value : String) Species.Builder
+    -requireSet(field : String, value : Object)$ void
+    -required(field : String, value : String)$ String
+    +scientificName(value : String) Species.Builder
+    +shape(value : BodyShape) Species.Builder
+    +source(value : String) Species.Builder
+    -validateAges() void
+    +zone(value : Zone) Species.Builder
+  }
+  class Zone {
+    <<enumeration>>
+    SURFACE
+    MIDWATER
+    SEAFLOOR
+    -displayName : String
+    -band : Range~Double~
+    -Zone(displayName : String, band : Range~Double~)
+    +at(depthFraction : double)$ Zone
+    +band() Range~Double~
+    +displayName() String
+  }
+  DisplayNamed <|.. Behavior
+  DisplayNamed <|.. BodyShape
+  BodyShape --> PreyKind : preyKind
+  Coexistence --> Range : sharedPeriod
+  Coexistence --> "*" Species : together
+  Coexistence --> "*" Species : apart
+  DisplayNamed <|.. Diet
+  Diet --> "*" PreyKind : accepted
+  Species --> Range : ageMa
+  Species --> Diet : diet
+  Species --> Zone : zone
+  Species --> Behavior : behavior
+  Species --> BodyShape : shape
+  Species ..> Species_Builder
+  SpeciesCatalog o-- "*" Species : byId
+  SpeciesCatalog ..> DuplicateSpeciesException
+  Species_Builder --> Diet : diet
+  Species_Builder --> Zone : zone
+  Species_Builder --> Behavior : behavior
+  Species_Builder --> BodyShape : shape
+  Species_Builder ..> Species
+  Species_Builder ..> InvalidScientificValueException
+  Species_Builder ..> HabitatViolationException
+  DisplayNamed <|.. Zone
+  Zone --> Range : band
+  class DuplicateSpeciesException["DuplicateSpeciesException<br>«paquete co.edu.autonoma.ancientseas.error»<br>Ver detalle: error.svg"]
+  click DuplicateSpeciesException href "error.svg" "Ver DuplicateSpeciesException en error.svg"
+  class InvalidScientificValueException["InvalidScientificValueException<br>«paquete co.edu.autonoma.ancientseas.error»<br>Ver detalle: error.svg"]
+  click InvalidScientificValueException href "error.svg" "Ver InvalidScientificValueException en error.svg"
+  class HabitatViolationException["HabitatViolationException<br>«paquete co.edu.autonoma.ancientseas.error»<br>Ver detalle: error.svg"]
+  click HabitatViolationException href "error.svg" "Ver HabitatViolationException en error.svg"

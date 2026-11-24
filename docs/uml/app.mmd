@@ -1,0 +1,94 @@
+---
+config:
+  handDrawnSeed: 1
+  htmlLabels: false
+  class:
+    htmlLabels: false
+---
+classDiagram
+  class AncientSeasApp {
+    -LOG : Logger$
+    -SPANISH : Locale$
+    -AA_PROPERTY : String$
+    -AncientSeasApp()
+    -enableTextAntialiasingWhereTheDesktopGivesNoHints()$ void
+    +main(args : String[])$ void
+    -useCrossPlatformLook()$ void
+  }
+  class FileMuseumServices {
+    -LOG : Logger$
+    -LEADERBOARD_PLACES : int$
+    -FILE_STAMP : DateTimeFormatter$
+    -data : DataDirectory
+    -speciesCsv : SpeciesCsv
+    -settingsStore : SettingsStore
+    -adminStore : AdminAccessStore
+    -historyStore : ScoreHistoryStore
+    -saves : SaveGameXml
+    -exporter : XmlExporter
+    -catalog : SpeciesCatalog
+    -catalogBackedUp : boolean
+    -catalogProblems : List~String~
+    -startupProblems : List~String~
+    -history : List~ScoreEntry~
+    -settings : GameSettings
+    -admin : AdminAccess
+    ~FileMuseumServices(data : DataDirectory)
+    -backUpCatalogWithSkippedRows() void
+    -bundledCatalog() SpeciesCatalog
+    +catalog() SpeciesCatalog
+    +catalogProblems() List~String~
+    +changeAdminPin(pin : char[]) void
+    +exportReport(result : ScoreEntry, census : Map~String,Integer~) Path
+    +exportScores() Path
+    -keep(result : LoadResult~T~) T
+    +leaderboard() Leaderboard
+    -loadCatalog() SpeciesCatalog
+    -modified(file : Path)$ FileTime
+    +recordError(message : String, error : Throwable) void
+    +recordEvent(message : String) void
+    +recordScore(entry : ScoreEntry) void
+    +resumeLatestGame() ResumeAttempt
+    +saveCatalog(edited : SpeciesCatalog) void
+    +saveGame(memento : GameMemento) Path
+    +saveSettings(newSettings : GameSettings) void
+    +settings() GameSettings
+    +startupProblems() List~String~
+    +verifyAdminPin(pin : char[]) boolean
+  }
+  MuseumServices <|.. FileMuseumServices
+  FileMuseumServices --> DataDirectory : data
+  FileMuseumServices --> SpeciesCsv : speciesCsv
+  FileMuseumServices --> SettingsStore : settingsStore
+  FileMuseumServices --> AdminAccessStore : adminStore
+  FileMuseumServices --> ScoreHistoryStore : historyStore
+  FileMuseumServices --> SaveGameXml : saves
+  FileMuseumServices --> XmlExporter : exporter
+  FileMuseumServices --> SpeciesCatalog : catalog
+  FileMuseumServices --> "*" ScoreEntry : history
+  FileMuseumServices --> GameSettings : settings
+  FileMuseumServices --> AdminAccess : admin
+  class MuseumServices["MuseumServices<br>«paquete co.edu.autonoma.ancientseas.ui»<br>Ver detalle: ui.svg"]
+  click MuseumServices href "ui.svg" "Ver MuseumServices en ui.svg"
+  class DataDirectory["DataDirectory<br>«paquete co.edu.autonoma.ancientseas.persistence»<br>Ver detalle: persistence.svg"]
+  click DataDirectory href "persistence.svg" "Ver DataDirectory en persistence.svg"
+  class SpeciesCsv["SpeciesCsv<br>«paquete co.edu.autonoma.ancientseas.persistence»<br>Ver detalle: persistence.svg"]
+  click SpeciesCsv href "persistence.svg" "Ver SpeciesCsv en persistence.svg"
+  class SettingsStore["SettingsStore<br>«paquete co.edu.autonoma.ancientseas.persistence»<br>Ver detalle: persistence.svg"]
+  click SettingsStore href "persistence.svg" "Ver SettingsStore en persistence.svg"
+  class AdminAccessStore["AdminAccessStore<br>«paquete co.edu.autonoma.ancientseas.persistence»<br>Ver detalle: persistence.svg"]
+  click AdminAccessStore href "persistence.svg" "Ver AdminAccessStore en persistence.svg"
+  class ScoreHistoryStore["ScoreHistoryStore<br>«paquete co.edu.autonoma.ancientseas.persistence»<br>Ver detalle: persistence.svg"]
+  click ScoreHistoryStore href "persistence.svg" "Ver ScoreHistoryStore en persistence.svg"
+  class SaveGameXml["SaveGameXml<br>«paquete co.edu.autonoma.ancientseas.persistence»<br>Ver detalle: persistence.svg"]
+  click SaveGameXml href "persistence.svg" "Ver SaveGameXml en persistence.svg"
+  class XmlExporter["XmlExporter<br>«paquete co.edu.autonoma.ancientseas.persistence»<br>Ver detalle: persistence.svg"]
+  click XmlExporter href "persistence.svg" "Ver XmlExporter en persistence.svg"
+  class SpeciesCatalog["SpeciesCatalog<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click SpeciesCatalog href "catalog.svg" "Ver SpeciesCatalog en catalog.svg"
+  class ScoreEntry["ScoreEntry<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click ScoreEntry href "game.svg" "Ver ScoreEntry en game.svg"
+  class GameSettings["GameSettings<br>«paquete co.edu.autonoma.ancientseas.game»<br>Ver detalle: game.svg"]
+  click GameSettings href "game.svg" "Ver GameSettings en game.svg"
+  class AdminAccess["AdminAccess<br>«paquete co.edu.autonoma.ancientseas.admin»<br>Ver detalle: admin.svg"]
+  click AdminAccess href "admin.svg" "Ver AdminAccess en admin.svg"
