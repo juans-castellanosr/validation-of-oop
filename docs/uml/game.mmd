@@ -1,0 +1,259 @@
+---
+config:
+  handDrawnSeed: 1
+  htmlLabels: false
+  class:
+    htmlLabels: false
+---
+classDiagram
+  class Difficulty {
+    <<enumeration>>
+    EASY
+    NORMAL
+    HARD
+    -displayName : String
+    -hunterSpeedFactor : double
+    -hunterCountFactor : double
+    -scoreMultiplier : double
+    -Difficulty(displayName : String, hunterSpeedFactor : double, hunterCountFactor : double, scoreMultiplier : double)
+    +displayName() String
+    +hunterCountFactor() double
+    +hunterSpeedFactor() double
+    +scoreMultiplier() double
+    +toString() String
+  }
+  class EntityView {
+    <<record>>
+    -id : long
+    -speciesId : String
+    -shape : BodyShape
+    -x : double
+    -y : double
+    -radius : double
+    -facingLeft : boolean
+    -player : boolean
+    -hunting : boolean
+    -recovering : boolean
+    -vx : double
+    -vy : double
+  }
+  class EventFrequency {
+    <<enumeration>>
+    LOW
+    NORMAL
+    HIGH
+    -displayName : String
+    -factor : double
+    -EventFrequency(displayName : String, factor : double)
+    +displayName() String
+    +factor() double
+    +toString() String
+  }
+  class GameEngine {
+    +STEPS_PER_SECOND : int$
+    +QUERY_TIMEOUT_SECONDS : long$
+    -DT : double$
+    -LOG : Logger$
+    -session : GameSession
+    -listener : GameListener
+    -commands : Queue~Consumer~GameSession~~
+    -executor : ScheduledExecutorService
+    -latest : GameSnapshot
+    -finishedReported : boolean
+    +GameEngine(session : GameSession, listener : GameListener)
+    -fail(error : Throwable) void
+    +isStopped() boolean
+    +latest() GameSnapshot
+    +launch() void
+    +query(query : Function~GameSession,T~) CompletableFuture~T~
+    +shutdown() void
+    +submit(command : Consumer~GameSession~) void
+    -tick() void
+  }
+  class GameListener {
+    <<interface>>
+    +onFailure(error : Throwable)* void «abstract»
+    +onFinished(finalSnapshot : GameSnapshot)* void «abstract»
+    +onFrame(snapshot : GameSnapshot)* void «abstract»
+    +onMessage(message : String)* void «abstract»
+  }
+  class GameMemento {
+    <<record>>
+    -settings : GameSettings
+    -elapsedSeconds : double
+    -nextId : long
+    -creatures : List~CreatureState~
+    -food : List~FoodState~
+    -events : List~EventState~
+    -secondsUntilNextEvent : double
+    -populationCaps : Map~String,Integer~
+    -planktonDue : double
+    -randomState : long
+    -speciesDefinitions : Map~String,String~
+    +GameMemento(settings : GameSettings, elapsedSeconds : double, nextId : long, creatures : List~CreatureState~, food : List~FoodState~, events : List~EventState~, secondsUntilNextEvent : double, populationCaps : Map~String,Integer~, planktonDue : double)
+    +GameMemento(settings : GameSettings, elapsedSeconds : double, nextId : long, creatures : List~CreatureState~, food : List~FoodState~, events : List~EventState~, secondsUntilNextEvent : double, populationCaps : Map~String,Integer~, planktonDue : double, randomState : long, speciesDefinitions : Map~String,String~)
+  }
+  class GameSession {
+    +PLAYER_SPECIES_ID : String$
+    -SAFE_SPAWN_DISTANCE : double$
+    -POPULATION_WEIGHT : Map~Behavior,Double~$
+    -ocean : Ocean
+    -player : PlayerCreature
+    -settings : GameSettings
+    -status : GameStatus
+    -elapsedSeconds : double
+    -lastStage : GrowthStage
+    -lastHealth : double
+    -GameSession(ocean : Ocean, player : PlayerCreature, settings : GameSettings, elapsedSeconds : double)
+    -arrivingHunters(catalog : SpeciesCatalog)$ List~Species~
+    -checkSpeciesUnchanged(memento : GameMemento, catalog : SpeciesCatalog)$ void
+    -checkValues(memento : GameMemento, catalog : SpeciesCatalog)$ void
+    +elapsedSeconds() double
+    +end() void
+    -initialPopulation(species : List~Species~, settings : GameSettings)$ Map~String,Integer~
+    +newGame(catalog : SpeciesCatalog, settings : GameSettings, source : Random)$ GameSession
+    +ocean() Ocean
+    +pause() void
+    +player() PlayerCreature
+    +restore(memento : GameMemento, catalog : SpeciesCatalog)$ GameSession
+    +result(playerName : String, playedAt : LocalDateTime) Optional~ScoreEntry~
+    +resume() void
+    +score() int
+    +settings() GameSettings
+    +snapshot() GameSnapshot
+    +start() void
+    +status() GameStatus
+    +step(dt : double) List~String~
+    +toMemento() GameMemento
+    -transition(from : GameStatus, to : GameStatus) void
+    -weight(s : Species, settings : GameSettings)$ double
+  }
+  class GameSettings {
+    <<record>>
+    -difficulty : Difficulty
+    -creatureCount : int
+    -eventFrequency : EventFrequency
+    -playerName : String
+    -reducedMotion : boolean
+    -interfaceSize : InterfaceSize
+    +CREATURE_COUNT : Range~Integer~$
+    +MAX_NAME_LENGTH : int$
+    +GameSettings(difficulty : Difficulty, creatureCount : int, eventFrequency : EventFrequency, playerName : String)
+    +GameSettings(difficulty : Difficulty, creatureCount : int, eventFrequency : EventFrequency, playerName : String, reducedMotion : boolean, interfaceSize : InterfaceSize)
+    +defaults()$ GameSettings
+    +withAccessibility(newReducedMotion : boolean, newSize : InterfaceSize) GameSettings
+  }
+  class GameSnapshot {
+    <<record>>
+    -status : GameStatus
+    -elapsedSeconds : double
+    -score : int
+    -health : double
+    -oxygen : double
+    -growth : double
+    -stage : GrowthStage
+    -width : double
+    -height : double
+    -creatures : List~EntityView~
+    -food : List~Vector2~
+    -current : Vector2
+    -cold : boolean
+    -populations : Map~String,Integer~
+    +GameSnapshot(status : GameStatus, elapsedSeconds : double, score : int, health : double, oxygen : double, growth : double, stage : GrowthStage, width : double, height : double, creatures : List~EntityView~, food : List~Vector2~, current : Vector2, cold : boolean, populations : Map~String,Integer~)
+  }
+  class GameStatus {
+    <<enumeration>>
+    READY
+    RUNNING
+    PAUSED
+    WON
+    LOST
+    ENDED
+    +isFinal() boolean
+  }
+  class InterfaceSize {
+    <<enumeration>>
+    NORMAL
+    LARGE
+    EXTRA_LARGE
+    -displayName : String
+    -scale : double
+    -InterfaceSize(displayName : String, scale : double)
+    +displayName() String
+    +scale() double
+    +toString() String
+  }
+  class Leaderboard {
+    +RANKING : Comparator~ScoreEntry~$
+    -capacity : int
+    -entries : List~ScoreEntry~
+    +Leaderboard(capacity : int)
+    +add(entry : ScoreEntry) boolean
+    +capacity() int
+    +iterator() Iterator~ScoreEntry~
+    +qualifies(score : int) boolean
+    +size() int
+  }
+  class ScoreEntry {
+    <<record>>
+    -playerName : String
+    -score : int
+    -stage : GrowthStage
+    -outcome : GameStatus
+    -durationSeconds : double
+    -difficulty : Difficulty
+    -playedAt : LocalDateTime
+    +ScoreEntry(playerName : String, score : int, stage : GrowthStage, outcome : GameStatus, durationSeconds : double, difficulty : Difficulty, playedAt : LocalDateTime)
+  }
+  DisplayNamed <|.. Difficulty
+  EntityView --> BodyShape : shape
+  DisplayNamed <|.. EventFrequency
+  GameEngine "1" *-- GameSession : session
+  GameEngine --> GameListener : listener
+  GameEngine --> GameSnapshot : latest
+  GameMemento --> GameSettings : settings
+  GameMemento --> "*" CreatureState : creatures
+  GameMemento --> "*" FoodState : food
+  GameMemento --> "*" EventState : events
+  GameSession "1" *-- Ocean : ocean
+  GameSession --> PlayerCreature : player
+  GameSession --> GameSettings : settings
+  GameSession --> GameStatus : status
+  GameSession --> GrowthStage : lastStage
+  GameSession ..> SpeciesCatalog
+  GameSession ..> SaveGameException
+  GameSettings --> Difficulty : difficulty
+  GameSettings --> EventFrequency : eventFrequency
+  GameSettings --> InterfaceSize : interfaceSize
+  GameSnapshot --> GameStatus : status
+  GameSnapshot --> GrowthStage : stage
+  GameSnapshot --> "*" EntityView : creatures
+  GameSnapshot --> "*" Vector2 : food
+  GameSnapshot --> Vector2 : current
+  DisplayNamed <|.. InterfaceSize
+  Leaderboard o-- "*" ScoreEntry : entries
+  ScoreEntry --> GrowthStage : stage
+  ScoreEntry --> GameStatus : outcome
+  ScoreEntry --> Difficulty : difficulty
+  class DisplayNamed["DisplayNamed<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click DisplayNamed href "catalog.svg" "Ver DisplayNamed en catalog.svg"
+  class BodyShape["BodyShape<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click BodyShape href "catalog.svg" "Ver BodyShape en catalog.svg"
+  class CreatureState["CreatureState<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click CreatureState href "model.svg" "Ver CreatureState en model.svg"
+  class FoodState["FoodState<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click FoodState href "model.svg" "Ver FoodState en model.svg"
+  class EventState["EventState<br>«paquete co.edu.autonoma.ancientseas.simulation»<br>Ver detalle: simulation.svg"]
+  click EventState href "simulation.svg" "Ver EventState en simulation.svg"
+  class Ocean["Ocean<br>«paquete co.edu.autonoma.ancientseas.simulation»<br>Ver detalle: simulation.svg"]
+  click Ocean href "simulation.svg" "Ver Ocean en simulation.svg"
+  class PlayerCreature["PlayerCreature<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click PlayerCreature href "model.svg" "Ver PlayerCreature en model.svg"
+  class GrowthStage["GrowthStage<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click GrowthStage href "model.svg" "Ver GrowthStage en model.svg"
+  class SpeciesCatalog["SpeciesCatalog<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click SpeciesCatalog href "catalog.svg" "Ver SpeciesCatalog en catalog.svg"
+  class SaveGameException["SaveGameException<br>«paquete co.edu.autonoma.ancientseas.error»<br>Ver detalle: error.svg"]
+  click SaveGameException href "error.svg" "Ver SaveGameException en error.svg"
+  class Vector2["Vector2<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click Vector2 href "model.svg" "Ver Vector2 en model.svg"

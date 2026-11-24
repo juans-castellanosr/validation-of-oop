@@ -1,0 +1,208 @@
+---
+config:
+  handDrawnSeed: 1
+  htmlLabels: false
+  class:
+    htmlLabels: false
+---
+classDiagram
+  class AdminAccessStore {
+    -PIN_KEY : String$
+    +AdminAccessStore()
+    +load(file : Path) LoadResult~AdminAccess~
+    +save(access : AdminAccess, file : Path) void
+  }
+  class ApplicationLog {
+    -TIMESTAMP : DateTimeFormatter$
+    -installed : FileHandler$
+    -ApplicationLog()
+    +install(logFile : Path)$ void
+    +uninstall()$ void
+  }
+  class ApplicationLog_LineFormatter["ApplicationLog.LineFormatter"] {
+    +format(record : LogRecord) String
+  }
+  class AtomicFile {
+    -AtomicFile()
+    -move(source : Path, target : Path)$ void
+    ~write(target : Path, content : byte[])$ void
+  }
+  class CsvParser {
+    -CsvParser()
+    -finishRecord(records : List~CsvRecord~, fields : List~String~, field : StringBuilder, recordLine : int)$ void
+    -nextIs(text : String, index : int, expected : char)$ boolean
+    ~parse(text : String, delimiter : char)$ List~CsvRecord~
+  }
+  class CsvRecord {
+    <<record>>
+    -line : int
+    -fields : List~String~
+  }
+  class CsvWriter {
+    -CsvWriter()
+    ~line(fields : List~String~)$ String
+    -quoteIfNeeded(value : String)$ String
+  }
+  class DataDirectory {
+    -DEFAULT_FOLDER : String$
+    -root : Path
+    +DataDirectory(root : Path)
+    +adminFile() Path
+    +defaultLocation()$ DataDirectory
+    +exportsDirectory() Path
+    +logFile() Path
+    +root() Path
+    +savesDirectory() Path
+    +scoresFile() Path
+    -seed(resource : String, target : Path, seeded : List~Path~)$ void
+    +seedIfMissing() List~Path~
+    +settingsFile() Path
+    +speciesFile() Path
+  }
+  class EnumParser {
+    -EnumParser()
+    ~parse(type : Class~E~, text : String)$ E
+  }
+  class LoadResult~T~ {
+    <<record>>
+    -value : T
+    -problems : List~String~
+    +LoadResult(value : T, problems : List~String~)
+    +clean(value : T)$ LoadResult~T~
+    +hasProblems() boolean
+    +withProblems(value : T, problems : List~String~)$ LoadResult~T~
+  }
+  class PropertiesFile {
+    -PropertiesFile()
+    ~read(file : Path)$ Properties
+    ~write(properties : Properties, file : Path, comment : String)$ void
+  }
+  class SaveElement {
+    -element : Element
+    ~SaveElement(element : Element)
+    ~child(tag : String) SaveElement
+    ~children(tag : String) List~SaveElement~
+    ~constant(attribute : String, type : Class~E~) E
+    ~content() String
+    -corrupt(detail : String, cause : Throwable) CorruptSaveException
+    ~flag(attribute : String) boolean
+    ~has(attribute : String) boolean
+    ~integer(attribute : String) long
+    ~number(attribute : String) double
+    ~text(attribute : String) String
+  }
+  class SaveGameXml {
+    +FORMAT_VERSION : int$
+    -ROOT : String$
+    +SaveGameXml()
+    -add(parent : Element, tag : String)$ Element
+    -optionalNumber(e : SaveElement, attribute : String)$ double
+    +read(file : Path) GameMemento
+    -readMemento(root : SaveElement)$ GameMemento
+    -setNumber(element : Element, attribute : String, value : double)$ void
+    -toInt(value : long)$ int
+    +write(memento : GameMemento, file : Path) void
+    -writeCreature(e : Element, c : CreatureState)$ void
+    -writeEvent(e : Element, s : EventState)$ void
+    -writeFood(e : Element, f : FoodState)$ void
+  }
+  class ScoreHistoryStore {
+    -COLUMNS : List~String~$
+    +ScoreHistoryStore()
+    +append(entry : ScoreEntry, file : Path) void
+    -endsWithLineFeed(file : Path)$ boolean
+    +load(file : Path) LoadResult~List~ScoreEntry~~
+    -parse(record : CsvRecord)$ ScoreEntry
+    -setAsideIncompleteLastRecord(file : Path)$ void
+    -toFields(e : ScoreEntry)$ List~String~
+  }
+  class SettingsStore {
+    -DIFFICULTY : String$
+    -CREATURE_COUNT : String$
+    -EVENT_FREQUENCY : String$
+    -PLAYER_NAME : String$
+    -REDUCED_MOTION : String$
+    -INTERFACE_SIZE : String$
+    +SettingsStore()
+    +load(file : Path) LoadResult~GameSettings~
+    -readConstant(properties : Properties, key : String, type : Class~E~, fallback : E, problems : List~String~)$ E
+    -readCreatureCount(properties : Properties, fallback : int, problems : List~String~)$ int
+    -readFlag(properties : Properties, key : String, fallback : boolean, problems : List~String~)$ boolean
+    -readPlayerName(properties : Properties, fallback : String, problems : List~String~)$ String
+    +save(settings : GameSettings, file : Path) void
+  }
+  class SpeciesCsv {
+    -ID : String$
+    -SCIENTIFIC_NAME : String$
+    -COMMON_NAME : String$
+    -PERIOD : String$
+    -MIN_MA : String$
+    -MAX_MA : String$
+    -LENGTH_METERS : String$
+    -DIET : String$
+    -ZONE : String$
+    -AIR_BREATHER : String$
+    -BEHAVIOR : String$
+    -SHAPE : String$
+    -FUN_FACT : String$
+    -SOURCE : String$
+    -COLUMNS : List~String~$
+    -NUMBER : Pattern$
+    -BOM : String$
+    -UNUSABLE_FILE : String$
+    +SpeciesCsv()
+    -cell(row : CsvRecord, columns : Map~String,Integer~, column : String)$ String
+    -constant(row : CsvRecord, columns : Map~String,Integer~, column : String, type : Class~E~)$ E
+    -detectDelimiter(text : String)$ char
+    -flag(row : CsvRecord, columns : Map~String,Integer~, column : String)$ boolean
+    -indexColumns(header : CsvRecord, problems : List~String~)$ Map~String,Integer~
+    -number(row : CsvRecord, columns : Map~String,Integer~, column : String, decimalComma : boolean)$ double
+    -parseRecords(text : String, delimiter : char)$ List~CsvRecord~
+    -parseSpecies(row : CsvRecord, columns : Map~String,Integer~, decimalComma : boolean)$ Species
+    +read(file : Path) LoadResult~SpeciesCatalog~
+    -readText(file : Path)$ String
+    -rowProblem(row : CsvRecord, detail : String)$ String
+    -toFields(s : Species)$ List~String~
+    +write(catalog : SpeciesCatalog, file : Path) void
+  }
+  class UnterminatedQuoteException {
+    -line : int
+    -recordsBefore : List~CsvRecord~
+    ~UnterminatedQuoteException(line : int, recordsBefore : List~CsvRecord~)
+    ~line() int
+    ~recordsBefore() List~CsvRecord~
+  }
+  class XmlDocuments {
+    -INDENT_AMOUNT : String$
+    -XmlDocuments()
+    ~create()$ Document
+    -newBuilder()$ DocumentBuilder
+    ~parse(in : InputStream)$ Document
+    ~toBytes(document : Document)$ byte[]
+  }
+  class XmlExporter {
+    +XmlExporter()
+    -add(parent : Element, tag : String)$ Element
+    -addResult(parent : Element, tag : String, score : ScoreEntry)$ void
+    -addText(parent : Element, tag : String, text : String)$ void
+    +exportExpeditionReport(result : ScoreEntry, census : Map~String,Integer~, catalog : SpeciesCatalog, file : Path) void
+    +exportScores(scores : Collection~ScoreEntry~, file : Path) void
+  }
+  AdminAccessStore ..> AdminAccess
+  SaveElement ..> CorruptSaveException
+  SaveGameXml ..> CorruptSaveException
+  SaveGameXml ..> IncompatibleSaveException
+  SpeciesCsv ..> SpeciesCatalog
+  SpeciesCsv ..> CatalogFormatException
+  UnterminatedQuoteException --> "*" CsvRecord : recordsBefore
+  XmlExporter ..> SpeciesCatalog
+  class AdminAccess["AdminAccess<br>«paquete co.edu.autonoma.ancientseas.admin»<br>Ver detalle: admin.svg"]
+  click AdminAccess href "admin.svg" "Ver AdminAccess en admin.svg"
+  class CorruptSaveException["CorruptSaveException<br>«paquete co.edu.autonoma.ancientseas.error»<br>Ver detalle: error.svg"]
+  click CorruptSaveException href "error.svg" "Ver CorruptSaveException en error.svg"
+  class IncompatibleSaveException["IncompatibleSaveException<br>«paquete co.edu.autonoma.ancientseas.error»<br>Ver detalle: error.svg"]
+  click IncompatibleSaveException href "error.svg" "Ver IncompatibleSaveException en error.svg"
+  class SpeciesCatalog["SpeciesCatalog<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click SpeciesCatalog href "catalog.svg" "Ver SpeciesCatalog en catalog.svg"
+  class CatalogFormatException["CatalogFormatException<br>«paquete co.edu.autonoma.ancientseas.error»<br>Ver detalle: error.svg"]
+  click CatalogFormatException href "error.svg" "Ver CatalogFormatException en error.svg"

@@ -1,0 +1,395 @@
+---
+config:
+  handDrawnSeed: 1
+  htmlLabels: false
+  class:
+    htmlLabels: false
+---
+classDiagram
+  namespace admin {
+    class AdminAccess
+  }
+  namespace app {
+    class AncientSeasApp
+    class FileMuseumServices
+  }
+  namespace catalog {
+    class Behavior {
+      <<enumeration>>
+    }
+    class BodyShape {
+      <<enumeration>>
+    }
+    class Coexistence
+    class Diet {
+      <<enumeration>>
+    }
+    class DisplayNamed {
+      <<interface>>
+    }
+    class PreyKind {
+      <<enumeration>>
+    }
+    class Range
+    class Species
+    class SpeciesCatalog
+    class Species_Builder["Species.Builder"]
+    class Zone {
+      <<enumeration>>
+    }
+  }
+  namespace error {
+    class AncientSeasException {
+      <<abstract>>
+    }
+    class CatalogFormatException
+    class CorruptSaveException
+    class DuplicateSpeciesException
+    class HabitatViolationException
+    class IncompatibleSaveException
+    class InvalidScientificValueException
+    class SaveGameException {
+      <<abstract>>
+    }
+  }
+  namespace game {
+    class Difficulty {
+      <<enumeration>>
+    }
+    class EntityView {
+      <<record>>
+    }
+    class EventFrequency {
+      <<enumeration>>
+    }
+    class GameEngine
+    class GameListener {
+      <<interface>>
+    }
+    class GameMemento {
+      <<record>>
+    }
+    class GameSession
+    class GameSettings {
+      <<record>>
+    }
+    class GameSnapshot {
+      <<record>>
+    }
+    class GameStatus {
+      <<enumeration>>
+    }
+    class InterfaceSize {
+      <<enumeration>>
+    }
+    class Leaderboard
+    class ScoreEntry {
+      <<record>>
+    }
+  }
+  namespace model {
+    class AirBreather {
+      <<interface>>
+    }
+    class Creature {
+      <<abstract>>
+    }
+    class CreatureFactory
+    class CreatureState {
+      <<record>>
+    }
+    class Drifter
+    class Edible {
+      <<interface>>
+    }
+    class Entity {
+      <<abstract>>
+    }
+    class FoodParticle
+    class FoodState {
+      <<record>>
+    }
+    class GrowthStage {
+      <<enumeration>>
+    }
+    class Hunter
+    class Lungs
+    class MarineReptile
+    class PlayerCreature
+    class SchoolingFish
+    class SeafloorDweller
+    class Surroundings {
+      <<interface>>
+    }
+    class Vector2 {
+      <<record>>
+    }
+  }
+  namespace persistence {
+    class AdminAccessStore
+    class ApplicationLog
+    class ApplicationLog_LineFormatter["ApplicationLog.LineFormatter"]
+    class AtomicFile
+    class CsvParser
+    class CsvRecord {
+      <<record>>
+    }
+    class CsvWriter
+    class DataDirectory
+    class EnumParser
+    class LoadResult {
+      <<record>>
+    }
+    class PropertiesFile
+    class SaveElement
+    class SaveGameXml
+    class ScoreHistoryStore
+    class SettingsStore
+    class SpeciesCsv
+    class UnterminatedQuoteException
+    class XmlDocuments
+    class XmlExporter
+  }
+  namespace simulation {
+    class ColdSnap
+    class EnvironmentEvent {
+      <<abstract>>
+    }
+    class EventScheduler
+    class EventState {
+      <<record>>
+    }
+    class EventType {
+      <<enumeration>>
+    }
+    class FoodShower
+    class Ocean
+    class OceanCurrent
+    class PredatorArrival
+    class ResumableRandom
+  }
+  namespace ui {
+    class BodyKit
+    class BodyKit_Palette["BodyKit.Palette"] {
+      <<record>>
+    }
+    class CatalogAdminActions {
+      <<interface>>
+    }
+    class CatalogAdminDialog
+    class CatalogAdminDialog_SpeciesTableModel["CatalogAdminDialog.SpeciesTableModel"]
+    class CoexistenceNote
+    class CreatureArt
+    class CreaturePainter {
+      <<interface>>
+    }
+    class CreaturePose {
+      <<record>>
+    }
+    class FeedbackEffects
+    class FeedbackEffects_Effect["FeedbackEffects.Effect"]
+    class FeedbackEffects_Kind["FeedbackEffects.Kind"] {
+      <<enumeration>>
+    }
+    class GameScreen
+    class GameScreenActions {
+      <<interface>>
+    }
+    class GameScreen_Direction["GameScreen.Direction"] {
+      <<enumeration>>
+    }
+    class GameScreen_OceanView["GameScreen.OceanView"]
+    class HudBar
+    class HudBar_Caption["HudBar.Caption"] {
+      <<record>>
+    }
+    class HudBar_Icon["HudBar.Icon"] {
+      <<enumeration>>
+    }
+    class LeaderboardTable
+    class MainWindow
+    class MainWindow_AdminActions["MainWindow.AdminActions"]
+    class MainWindow_DialogPause["MainWindow.DialogPause"] {
+      <<record>>
+    }
+    class MainWindow_Export["MainWindow.Export"] {
+      <<interface>>
+    }
+    class MainWindow_GameActions["MainWindow.GameActions"]
+    class MenuScreen
+    class MenuScreen_Emblem["MenuScreen.Emblem"]
+    class MenuScreen_HowToPlay["MenuScreen.HowToPlay"]
+    class MenuScreen_Title["MenuScreen.Title"]
+    class MuseumServices {
+      <<interface>>
+    }
+    class OceanButton
+    class OceanRenderer
+    class OceanRenderer_Look["OceanRenderer.Look"]
+    class OceanScenery
+    class ResultsDialog
+    class ResultsDialog_Banner["ResultsDialog.Banner"]
+    class ResultsDialog_Choice["ResultsDialog.Choice"] {
+      <<enumeration>>
+    }
+    class ResumeAttempt {
+      <<record>>
+    }
+    class ScoresDialog
+    class SettingsDialog
+    class SpeciesBrowserDialog
+    class SpeciesFormDialog
+    class SpeciesInfoDialog
+    class SpeciesInfoDialog_Portrait["SpeciesInfoDialog.Portrait"]
+    class TableStyle
+    class TableStyle_Stripes["TableStyle.Stripes"]
+    class Theme
+    class UiFactory
+    class UiScale
+  }
+  DisplayNamed <|.. Behavior
+  DisplayNamed <|.. BodyShape
+  BodyShape --> PreyKind : preyKind
+  CatalogAdminDialog --> SpeciesCatalog : catalog
+  CatalogAdminDialog --> CatalogAdminActions : actions
+  CatalogAdminDialog --> CatalogAdminDialog_SpeciesTableModel : model
+  CatalogAdminDialog --> CatalogAdminDialog_SpeciesTableModel : sorter
+  CatalogAdminDialog_SpeciesTableModel --> SpeciesCatalog : catalog
+  CatalogAdminDialog_SpeciesTableModel --> "*" Species : rows
+  AncientSeasException <|-- CatalogFormatException
+  Coexistence --> Range : sharedPeriod
+  Coexistence --> "*" Species : together
+  Coexistence --> "*" Species : apart
+  EnvironmentEvent <|-- ColdSnap
+  SaveGameException <|-- CorruptSaveException
+  Entity <|-- Creature
+  Edible <|.. Creature
+  Creature --> Species : species
+  Creature --> Vector2 : velocity
+  CreatureState --> Vector2 : destination
+  DisplayNamed <|.. Diet
+  Diet --> "*" PreyKind : accepted
+  DisplayNamed <|.. Difficulty
+  Creature <|-- Drifter
+  Drifter --> Vector2 : jetDirection
+  AncientSeasException <|-- DuplicateSpeciesException
+  Entity --> Vector2 : position
+  EntityView --> BodyShape : shape
+  DisplayNamed <|.. EventFrequency
+  EventScheduler "1" *-- "*" EnvironmentEvent : active
+  EventState --> EventType : type
+  FeedbackEffects --> "*" FeedbackEffects_Effect : effects
+  FeedbackEffects --> GameSnapshot : previous
+  FeedbackEffects_Effect --> FeedbackEffects_Kind : kind
+  MuseumServices <|.. FileMuseumServices
+  FileMuseumServices --> DataDirectory : data
+  FileMuseumServices --> SpeciesCsv : speciesCsv
+  FileMuseumServices --> SettingsStore : settingsStore
+  FileMuseumServices --> AdminAccessStore : adminStore
+  FileMuseumServices --> ScoreHistoryStore : historyStore
+  FileMuseumServices --> SaveGameXml : saves
+  FileMuseumServices --> XmlExporter : exporter
+  FileMuseumServices --> SpeciesCatalog : catalog
+  FileMuseumServices --> "*" ScoreEntry : history
+  FileMuseumServices --> GameSettings : settings
+  FileMuseumServices --> AdminAccess : admin
+  Entity <|-- FoodParticle
+  Edible <|.. FoodParticle
+  EnvironmentEvent <|-- FoodShower
+  GameEngine "1" *-- GameSession : session
+  GameEngine --> GameListener : listener
+  GameEngine --> GameSnapshot : latest
+  GameMemento --> GameSettings : settings
+  GameMemento --> "*" CreatureState : creatures
+  GameMemento --> "*" FoodState : food
+  GameMemento --> "*" EventState : events
+  GameScreen --> GameScreenActions : actions
+  GameScreen --> OceanRenderer : renderer
+  GameScreen --> "*" GameScreen_Direction : held
+  GameScreen --> FeedbackEffects : effects
+  GameScreen --> HudBar : hud
+  GameScreen --> GameScreen_OceanView : ocean
+  GameScreen --> GameEngine : engine
+  GameScreen_Direction --> Vector2 : vector
+  GameSession "1" *-- Ocean : ocean
+  GameSession --> PlayerCreature : player
+  GameSession --> GameSettings : settings
+  GameSession --> GameStatus : status
+  GameSession --> GrowthStage : lastStage
+  GameSettings --> Difficulty : difficulty
+  GameSettings --> EventFrequency : eventFrequency
+  GameSettings --> InterfaceSize : interfaceSize
+  GameSnapshot --> GameStatus : status
+  GameSnapshot --> GrowthStage : stage
+  GameSnapshot --> "*" EntityView : creatures
+  GameSnapshot --> "*" Vector2 : food
+  GameSnapshot --> Vector2 : current
+  AncientSeasException <|-- HabitatViolationException
+  HudBar --> GameSnapshot : snapshot
+  Creature <|-- Hunter
+  SaveGameException <|-- IncompatibleSaveException
+  DisplayNamed <|.. InterfaceSize
+  AncientSeasException <|-- InvalidScientificValueException
+  Leaderboard o-- "*" ScoreEntry : entries
+  MainWindow --> MuseumServices : services
+  MainWindow --> MenuScreen : menu
+  MainWindow --> GameScreen : game
+  MainWindow --> GameEngine : engine
+  CatalogAdminActions <|.. MainWindow_AdminActions
+  MainWindow_DialogPause --> GameEngine : engine
+  GameScreenActions <|.. MainWindow_GameActions
+  Hunter <|-- MarineReptile
+  AirBreather <|.. MarineReptile
+  MarineReptile "1" *-- Lungs : lungs
+  MenuScreen --> OceanRenderer : renderer
+  Surroundings <|.. Ocean
+  Ocean --> ResumableRandom : random
+  Ocean --> "*" Species : residents
+  Ocean "1" *-- EventScheduler : events
+  Ocean "1" *-- "*" Creature : creatures
+  Ocean "1" *-- "*" Creature : births
+  Ocean "1" *-- "*" FoodParticle : food
+  Ocean --> Vector2 : current
+  EnvironmentEvent <|-- OceanCurrent
+  OceanRenderer --> OceanScenery : scenery
+  OceanRenderer --> "*" OceanRenderer_Look : looks
+  Creature <|-- PlayerCreature
+  AirBreather <|.. PlayerCreature
+  PlayerCreature "1" *-- Lungs : lungs
+  PlayerCreature --> Vector2 : direction
+  PlayerCreature --> Vector2 : destination
+  EnvironmentEvent <|-- PredatorArrival
+  PredatorArrival --> Species : predator
+  ResultsDialog --> ResultsDialog_Choice : choice
+  ResultsDialog_Banner --> GameStatus : outcome
+  ResultsDialog_Banner --> GrowthStage : stage
+  ResumeAttempt --> "0..1" GameSession : session
+  AncientSeasException <|-- SaveGameException
+  Creature <|-- SchoolingFish
+  ScoreEntry --> GrowthStage : stage
+  ScoreEntry --> GameStatus : outcome
+  ScoreEntry --> Difficulty : difficulty
+  Creature <|-- SeafloorDweller
+  SettingsDialog --> Difficulty : difficulty
+  SettingsDialog --> EventFrequency : events
+  SettingsDialog --> InterfaceSize : size
+  SettingsDialog --> GameSettings : result
+  Species --> Range : ageMa
+  Species --> Diet : diet
+  Species --> Zone : zone
+  Species --> Behavior : behavior
+  Species --> BodyShape : shape
+  SpeciesCatalog o-- "*" Species : byId
+  SpeciesFormDialog --> Diet : diet
+  SpeciesFormDialog --> Zone : zone
+  SpeciesFormDialog --> Behavior : behavior
+  SpeciesFormDialog --> BodyShape : shape
+  SpeciesFormDialog --> Species : result
+  SpeciesInfoDialog_Portrait --> Species : species
+  Species_Builder --> Diet : diet
+  Species_Builder --> Zone : zone
+  Species_Builder --> Behavior : behavior
+  Species_Builder --> BodyShape : shape
+  UnterminatedQuoteException --> "*" CsvRecord : recordsBefore
+  DisplayNamed <|.. Zone
+  Zone --> Range : band

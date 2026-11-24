@@ -1,0 +1,48 @@
+---
+config:
+  handDrawnSeed: 1
+  htmlLabels: false
+  class:
+    htmlLabels: false
+---
+classDiagram
+  class AncientSeasException {
+    <<abstract>>
+    -friendlyMessage : String
+    #AncientSeasException(technicalMessage : String, friendlyMessage : String)
+    #AncientSeasException(technicalMessage : String, friendlyMessage : String, cause : Throwable)
+    +getFriendlyMessage() String
+  }
+  class CatalogFormatException {
+    +CatalogFormatException(technicalMessage : String, friendlyMessage : String)
+    +CatalogFormatException(technicalMessage : String, friendlyMessage : String, cause : Throwable)
+  }
+  class CorruptSaveException {
+    +CorruptSaveException(technicalMessage : String, cause : Throwable)
+  }
+  class DuplicateSpeciesException {
+    +DuplicateSpeciesException(speciesId : String)
+  }
+  class HabitatViolationException {
+    +HabitatViolationException(speciesId : String, detail : String)
+  }
+  class IncompatibleSaveException {
+    +IncompatibleSaveException(technicalMessage : String)
+    +IncompatibleSaveException(technicalMessage : String, friendlyMessage : String)
+  }
+  class InvalidScientificValueException {
+    -field : String
+    +InvalidScientificValueException(field : String, reason : String)
+    +getField() String
+  }
+  class SaveGameException {
+    <<abstract>>
+    #SaveGameException(technicalMessage : String, friendlyMessage : String, cause : Throwable)
+  }
+  AncientSeasException <|-- CatalogFormatException
+  SaveGameException <|-- CorruptSaveException
+  AncientSeasException <|-- DuplicateSpeciesException
+  AncientSeasException <|-- HabitatViolationException
+  SaveGameException <|-- IncompatibleSaveException
+  AncientSeasException <|-- InvalidScientificValueException
+  AncientSeasException <|-- SaveGameException

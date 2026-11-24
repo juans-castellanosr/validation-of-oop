@@ -1,0 +1,187 @@
+---
+config:
+  handDrawnSeed: 1
+  htmlLabels: false
+  class:
+    htmlLabels: false
+---
+classDiagram
+  class ColdSnap {
+    +ACTIVITY : double$
+    +ColdSnap(durationSeconds : double, elapsedSeconds : double)
+    +announcement() String
+    #apply(ocean : Ocean) void
+    +toState() EventState
+    +type() EventType
+  }
+  class EnvironmentEvent {
+    <<abstract>>
+    -durationSeconds : double
+    -elapsedSeconds : double
+    #EnvironmentEvent(durationSeconds : double, elapsedSeconds : double)
+    +announcement()* String «abstract»
+    #apply(ocean : Ocean) void
+    #begin(ocean : Ocean) void
+    #durationSeconds() double
+    #elapsedSeconds() double
+    +isFinished() boolean
+    ~tick(ocean : Ocean, dt : double) void
+    +toState()* EventState «abstract»
+    +type()* EventType «abstract»
+  }
+  class EventScheduler {
+    +MEAN_INTERVAL_SECONDS : double$
+    -random : Random
+    -frequency : double
+    -factories : List~Supplier~EnvironmentEvent~~
+    -active : List~EnvironmentEvent~
+    -secondsUntilNext : double
+    +EventScheduler(random : Random, frequency : double, hunters : List~Species~)
+    +active() List~EnvironmentEvent~
+    -nextInterval() double
+    -pickNewEvent() Optional~EnvironmentEvent~
+    +restore(states : List~EventState~, countdown : double, speciesLookup : Function&lt;String, Optional&lt;Species&gt;&gt;) void
+    +secondsUntilNext() double
+    ~tick(ocean : Ocean, dt : double) List~EnvironmentEvent~
+  }
+  class EventState {
+    <<record>>
+    -type : EventType
+    -elapsedSeconds : double
+    -durationSeconds : double
+    -direction : double
+    -speciesId : String
+  }
+  class EventType {
+    <<enumeration>>
+    CURRENT
+    COLD_SNAP
+    FOOD_SHOWER
+    PREDATOR_ARRIVAL
+  }
+  class FoodShower {
+    +PARTICLES : int$
+    +FoodShower(durationSeconds : double, elapsedSeconds : double)
+    +announcement() String
+    #begin(ocean : Ocean) void
+    +toState() EventState
+    +type() EventType
+  }
+  class Ocean {
+    +DEFAULT_WIDTH : double$
+    +DEFAULT_HEIGHT : double$
+    +MAX_FOOD : int$
+    -PLANKTON_PER_SECOND : double$
+    -NEWCOMERS_PER_SECOND : double$
+    -FOOD_LIFETIME_SECONDS : double$
+    -width : double
+    -height : double
+    -random : ResumableRandom
+    -hunterSpeedFactor : double
+    -populationCaps : Map~String,Integer~
+    -residents : List~Species~
+    -events : EventScheduler
+    -creatures : List~Creature~
+    -births : List~Creature~
+    -food : List~FoodParticle~
+    -nextId : long
+    -planktonDue : double
+    -current : Vector2
+    -activityFactor : double
+    +Ocean(width : double, height : double, random : ResumableRandom, hunterSpeedFactor : double, eventFrequency : double, populationCaps : Map~String,Integer~, residents : List~Species~, arrivingHunters : List~Species~)
+    +activityFactor() double
+    +add(creature : Creature) void
+    ~addArrivingPredator(species : Species) void
+    -addFood(at : Vector2) void
+    -addFoodInWater() void
+    ~addFoodNearSurface() void
+    -bringNewcomers(dt : double) void
+    +census() Map~String,Integer~
+    +creatures() List~Creature~
+    +current() Vector2
+    +currentAt(point : Vector2) Vector2
+    +events() EventScheduler
+    +food() List~FoodParticle~
+    -growPlankton(dt : double) void
+    +height() double
+    +hunterSpeedFactor() double
+    +nearestEdible(eater : Creature, radius : double) Optional~Edible~
+    +nearestThreat(target : Creature, radius : double) Optional~Creature~
+    +nextId() long
+    +planktonDue() double
+    +populationCaps() Map~String,Integer~
+    +populationOf(speciesId : String) int
+    +random() Random
+    -randomPointIn(zone : Zone) Vector2
+    +randomState() long
+    +requestOffspring(parent : Creature) boolean
+    -requireHabitat(species : Species, p : Vector2) void
+    +restoreCounters(savedNextId : long, savedPlanktonDue : double) void
+    +restoreFood(state : FoodState) void
+    +restoreRandomState(savedState : long) void
+    +sameSpeciesNear(creature : Creature, radius : double) List~Creature~
+    ~setActivityFactor(factor : double) void
+    ~setCurrent(drift : Vector2) void
+    +spawnInZone(species : Species, sizeMeters : double, energy : double, acceptable : Predicate~Vector2~) Creature
+    +step(dt : double) List~String~
+    +width() double
+  }
+  class OceanCurrent {
+    +STRENGTH : double$
+    -direction : double
+    +OceanCurrent(direction : double, durationSeconds : double, elapsedSeconds : double)
+    +announcement() String
+    #apply(ocean : Ocean) void
+    +toState() EventState
+    +type() EventType
+  }
+  class PredatorArrival {
+    -predator : Species
+    +PredatorArrival(predator : Species, durationSeconds : double, elapsedSeconds : double)
+    +announcement() String
+    #begin(ocean : Ocean) void
+    +toState() EventState
+    +type() EventType
+  }
+  class ResumableRandom {
+    -MULTIPLIER : long$
+    -ADDEND : long$
+    -MASK : long$
+    -state : long
+    -ResumableRandom(state : long)
+    #next(bits : int) int
+    +resumeAt(savedState : long) void
+    +seeded(seed : long)$ ResumableRandom
+    +state() long
+  }
+  EnvironmentEvent <|-- ColdSnap
+  EnvironmentEvent ..> Ocean
+  EventScheduler "1" *-- "*" EnvironmentEvent : active
+  EventScheduler ..> Species
+  EventScheduler ..> Ocean
+  EventState --> EventType : type
+  EnvironmentEvent <|-- FoodShower
+  Surroundings <|.. Ocean
+  Ocean --> ResumableRandom : random
+  Ocean --> "*" Species : residents
+  Ocean "1" *-- EventScheduler : events
+  Ocean "1" *-- "*" Creature : creatures
+  Ocean "1" *-- "*" Creature : births
+  Ocean "1" *-- "*" FoodParticle : food
+  Ocean --> Vector2 : current
+  Ocean ..> HabitatViolationException
+  EnvironmentEvent <|-- OceanCurrent
+  EnvironmentEvent <|-- PredatorArrival
+  PredatorArrival --> Species : predator
+  class Species["Species<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click Species href "catalog.svg" "Ver Species en catalog.svg"
+  class Surroundings["Surroundings<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click Surroundings href "model.svg" "Ver Surroundings en model.svg"
+  class Creature["Creature<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click Creature href "model.svg" "Ver Creature en model.svg"
+  class FoodParticle["FoodParticle<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click FoodParticle href "model.svg" "Ver FoodParticle en model.svg"
+  class Vector2["Vector2<br>«paquete co.edu.autonoma.ancientseas.model»<br>Ver detalle: model.svg"]
+  click Vector2 href "model.svg" "Ver Vector2 en model.svg"
+  class HabitatViolationException["HabitatViolationException<br>«paquete co.edu.autonoma.ancientseas.error»<br>Ver detalle: error.svg"]
+  click HabitatViolationException href "error.svg" "Ver HabitatViolationException en error.svg"

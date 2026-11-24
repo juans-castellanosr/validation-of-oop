@@ -1,0 +1,355 @@
+---
+config:
+  handDrawnSeed: 1
+  htmlLabels: false
+  class:
+    htmlLabels: false
+---
+classDiagram
+  class AirBreather {
+    <<interface>>
+    +SURFACING_THRESHOLD : double$
+    +lungs()* Lungs «abstract»
+    +needsAir() boolean
+  }
+  class Creature {
+    <<abstract>>
+    +PREY_SIZE_RATIO : double$
+    +MIN_PREY_SIZE_RATIO : double$
+    #FULL_MEAL_FRACTION : double$
+    #BREEDING_ENERGY : double$
+    #BREEDING_COST : double$
+    -species : Species
+    -velocity : Vector2
+    -sizeMeters : double
+    -energy : double
+    -ageSeconds : double
+    -digestSeconds : double
+    -reproductionSeconds : double
+    -wanderAngle : double
+    #Creature(id : long, species : Species, position : Vector2, sizeMeters : double, energy : double)
+    +ageSeconds() double
+    #agility() double
+    #allowedBand() Range~Double~
+    #atSurface(world : Surroundings) boolean
+    #burstDirection() Vector2
+    #burstRecoverySeconds() double
+    #burstSeconds() double
+    +canEat(food : Edible) boolean
+    #canReproduce() boolean
+    -clamp01(v : double)$ double
+    +consume() boolean
+    #cruiseSpeed()* double «abstract»
+    #currentExposure() double
+    #destination() Vector2
+    #digestTime() double
+    +energy() double
+    #feed(world : Surroundings) void
+    #flee(danger : Vector2, speed : double) Vector2
+    #growthPoints() double
+    +healthLevel() double
+    +isAvailable() boolean
+    +isDigesting() boolean
+    +isHunting() boolean
+    +isOfSpecies(other : Species) boolean
+    +isPlayer() boolean
+    #live(world : Surroundings, dt : double) void
+    #maturitySeconds() double
+    #maxSpeed(world : Surroundings) double
+    #metabolism()* double «abstract»
+    +nutrition() double
+    #onAte(food : Edible) void
+    +oxygenLevel() double
+    +preyKind() PreyKind
+    #protectionSeconds() double
+    +radius() double
+    #reach() double
+    #restore(state : CreatureState) void
+    #seek(target : Vector2, speed : double) Vector2
+    #setSizeMeters(newSizeMeters : double) void
+    +sizeMeters() double
+    +species() Species
+    #spendEnergy(amount : double) void
+    -stayInHabitat(world : Surroundings) void
+    #steer(world : Surroundings, dt : double)* Vector2 «abstract»
+    +toState() CreatureState
+    +update(world : Surroundings, dt : double) void
+    +velocity() Vector2
+    #wander(world : Surroundings, dt : double, speed : double) Vector2
+  }
+  class CreatureFactory {
+    -CreatureFactory()
+    +create(id : long, species : Species, position : Vector2, sizeMeters : double, energy : double)$ Creature
+    +restore(species : Species, state : CreatureState)$ Creature
+    +restorePlayer(species : Species, state : CreatureState)$ PlayerCreature
+  }
+  class CreatureState {
+    <<record>>
+    -id : long
+    -speciesId : String
+    -player : boolean
+    -x : double
+    -y : double
+    -vx : double
+    -vy : double
+    -sizeMeters : double
+    -energy : double
+    -ageSeconds : double
+    -digestSeconds : double
+    -reproductionSeconds : double
+    -oxygen : double
+    -health : double
+    -growthPoints : double
+    -protectionSeconds : double
+    -wanderAngle : double
+    -burstSeconds : double
+    -burstRecoverySeconds : double
+    -burstDirectionX : double
+    -burstDirectionY : double
+    -destination : Vector2
+  }
+  class Drifter {
+    -THREAT_SIGHT : double$
+    -JET_SECONDS : double$
+    -JET_RECOVERY_SECONDS : double$
+    -FOOD_SIGHT : double$
+    -HUNGRY : double$
+    -jetSeconds : double
+    -recoverySeconds : double
+    -jetDirection : Vector2
+    +Drifter(id : long, species : Species, position : Vector2, sizeMeters : double, energy : double)
+    #agility() double
+    #burstDirection() Vector2
+    #burstRecoverySeconds() double
+    #burstSeconds() double
+    #cruiseSpeed() double
+    #maturitySeconds() double
+    #maxSpeed(world : Surroundings) double
+    #metabolism() double
+    #reach() double
+    #restore(state : CreatureState) void
+    #steer(world : Surroundings, dt : double) Vector2
+  }
+  class Edible {
+    <<interface>>
+    +consume()* boolean «abstract»
+    +isAvailable()* boolean «abstract»
+    +isOfSpecies(species : Species) boolean
+    +nutrition()* double «abstract»
+    +position()* Vector2 «abstract»
+    +preyKind()* PreyKind «abstract»
+    +radius()* double «abstract»
+    +sizeMeters()* double «abstract»
+  }
+  class Entity {
+    <<abstract>>
+    -id : long
+    -position : Vector2
+    -alive : boolean
+    #Entity(id : long, position : Vector2)
+    +id() long
+    +isAlive() boolean
+    #markDead() void
+    #moveTo(newPosition : Vector2) void
+    +position() Vector2
+    +radius()* double «abstract»
+  }
+  class FoodParticle {
+    +NUTRITION : double$
+    -SIZE_METERS : double$
+    -SINK_SPEED : double$
+    -RADIUS : double$
+    -secondsLeft : double
+    +FoodParticle(id : long, position : Vector2, secondsLeft : double)
+    +consume() boolean
+    +isAvailable() boolean
+    +nutrition() double
+    +preyKind() PreyKind
+    +radius() double
+    +secondsLeft() double
+    +sizeMeters() double
+    +update(floorY : double, drift : Vector2, dt : double) void
+  }
+  class FoodState {
+    <<record>>
+    -id : long
+    -x : double
+    -y : double
+    -secondsLeft : double
+  }
+  class GrowthStage {
+    <<enumeration>>
+    HATCHLING
+    JUVENILE
+    SUBADULT
+    ADULT
+    -displayName : String
+    -lengthFraction : double
+    -pointsRequired : double
+    -GrowthStage(displayName : String, lengthFraction : double, pointsRequired : double)
+    +displayName() String
+    +forPoints(points : double)$ GrowthStage
+    +lengthAt(points : double, adultLengthMeters : double)$ double
+    +overallProgress(points : double)$ double
+    +pointsRequired() double
+  }
+  class Hunter {
+    -SIGHT : double$
+    -CHASE_FACTOR : double$
+    +HUNGER_THRESHOLD : double$
+    -chasing : boolean
+    +Hunter(id : long, species : Species, position : Vector2, sizeMeters : double, energy : double)
+    #allowedBand() Range~Double~
+    #cruiseSpeed() double
+    #digestTime() double
+    #feed(world : Surroundings) void
+    +isHungry() boolean
+    +isHunting() boolean
+    #maturitySeconds() double
+    #maxSpeed(world : Surroundings) double
+    #metabolism() double
+    #steer(world : Surroundings, dt : double) Vector2
+  }
+  class Lungs {
+    -secondsOfAir : double
+    -oxygen : double
+    +Lungs(secondsOfAir : double)
+    +breathe(atSurface : boolean, dt : double) void
+    +isEmpty() boolean
+    +oxygen() double
+    +restore(level : double) void
+  }
+  class MarineReptile {
+    -SECONDS_OF_AIR : double$
+    -SUFFOCATION_ENERGY_PER_SECOND : double$
+    -lungs : Lungs
+    +MarineReptile(id : long, species : Species, position : Vector2, sizeMeters : double, energy : double)
+    #live(world : Surroundings, dt : double) void
+    +lungs() Lungs
+    +oxygenLevel() double
+    #restore(state : CreatureState) void
+    #steer(world : Surroundings, dt : double) Vector2
+  }
+  class PlayerCreature {
+    +BITE_DAMAGE : double$
+    +DROWNING_DAMAGE_PER_SECOND : double$
+    -SECONDS_OF_AIR : double$
+    -SAFE_SECONDS_AFTER_BITE : double$
+    -lungs : Lungs
+    -adultLengthMeters : double
+    -health : double
+    -growthPoints : double
+    -safeSeconds : double
+    -direction : Vector2
+    -destination : Vector2
+    +PlayerCreature(id : long, species : Species, position : Vector2)
+    #agility() double
+    #allowedBand() Range~Double~
+    #canReproduce() boolean
+    +consume() boolean
+    #cruiseSpeed() double
+    #destination() Vector2
+    #digestTime() double
+    +foodPoints() double
+    #growthPoints() double
+    +healthLevel() double
+    -hurt(amount : double) void
+    +isPlayer() boolean
+    +isRecovering() boolean
+    #live(world : Surroundings, dt : double) void
+    +lungs() Lungs
+    #metabolism() double
+    +nutrition() double
+    #onAte(food : Edible) void
+    +oxygenLevel() double
+    #protectionSeconds() double
+    #restore(state : CreatureState) void
+    +stage() GrowthStage
+    #steer(world : Surroundings, dt : double) Vector2
+    +steerTowards(newDirection : Vector2) void
+    +swimTo(point : Vector2) void
+  }
+  class SchoolingFish {
+    -THREAT_SIGHT : double$
+    -FOOD_SIGHT : double$
+    -SCHOOL_RADIUS : double$
+    +SchoolingFish(id : long, species : Species, position : Vector2, sizeMeters : double, energy : double)
+    #allowedBand() Range~Double~
+    #cruiseSpeed() double
+    #maturitySeconds() double
+    #maxSpeed(world : Surroundings) double
+    #metabolism() double
+    #steer(world : Surroundings, dt : double) Vector2
+  }
+  class SeafloorDweller {
+    +RESTING_BAND : Range~Double~$
+    +SeafloorDweller(id : long, species : Species, position : Vector2, sizeMeters : double, energy : double)
+    #allowedBand() Range~Double~
+    #cruiseSpeed() double
+    #currentExposure() double
+    #maturitySeconds() double
+    #metabolism() double
+    #reach() double
+    #steer(world : Surroundings, dt : double) Vector2
+  }
+  class Surroundings {
+    <<interface>>
+    +activityFactor()* double «abstract»
+    +currentAt(point : Vector2)* Vector2 «abstract»
+    +height()* double «abstract»
+    +hunterSpeedFactor()* double «abstract»
+    +nearestEdible(eater : Creature, radius : double)* Optional~Edible~ «abstract»
+    +nearestThreat(target : Creature, radius : double)* Optional~Creature~ «abstract»
+    +random()* Random «abstract»
+    +requestOffspring(parent : Creature)* boolean «abstract»
+    +sameSpeciesNear(creature : Creature, radius : double)* List~Creature~ «abstract»
+    +width()* double «abstract»
+  }
+  class Vector2 {
+    <<record>>
+    -x : double
+    -y : double
+    +ZERO : Vector2$
+    +distanceTo(o : Vector2) double
+    +length() double
+    +lerp(target : Vector2, t : double) Vector2
+    +limit(max : double) Vector2
+    +minus(o : Vector2) Vector2
+    +normalized() Vector2
+    +plus(o : Vector2) Vector2
+    +times(factor : double) Vector2
+  }
+  AirBreather ..> Lungs
+  Entity <|-- Creature
+  Edible <|.. Creature
+  Creature --> Species : species
+  Creature --> Vector2 : velocity
+  Creature ..> Range
+  Creature ..> Surroundings
+  CreatureFactory ..> Species
+  CreatureFactory ..> Creature
+  CreatureFactory ..> PlayerCreature
+  CreatureState --> Vector2 : destination
+  Creature <|-- Drifter
+  Drifter --> Vector2 : jetDirection
+  Edible ..> Species
+  Entity --> Vector2 : position
+  Entity <|-- FoodParticle
+  Edible <|.. FoodParticle
+  Creature <|-- Hunter
+  Hunter <|-- MarineReptile
+  AirBreather <|.. MarineReptile
+  MarineReptile "1" *-- Lungs : lungs
+  Creature <|-- PlayerCreature
+  AirBreather <|.. PlayerCreature
+  PlayerCreature "1" *-- Lungs : lungs
+  PlayerCreature --> Vector2 : direction
+  PlayerCreature --> Vector2 : destination
+  Creature <|-- SchoolingFish
+  Creature <|-- SeafloorDweller
+  Surroundings ..> Creature
+  Surroundings ..> Edible
+  class Species["Species<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click Species href "catalog.svg" "Ver Species en catalog.svg"
+  class Range["Range<br>«paquete co.edu.autonoma.ancientseas.catalog»<br>Ver detalle: catalog.svg"]
+  click Range href "catalog.svg" "Ver Range en catalog.svg"
